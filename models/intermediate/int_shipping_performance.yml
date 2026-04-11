@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: int_shipping_performance
+    description: >
+      Intermediate model that adds shipping delay logic, severity bucketing,
+      fulfillment cycle time, and order health flags on top of the staging layer.
+      Grain is one row per order line item, inherited from stg_supply_chain.
+    columns:
+      - name: order_item_id
+        description: "Primary key. One row per order line item."
+        tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: "Order identifier. Not unique at this grain."
+        tests:
+          - not_null
+
+      - name: is_late_shipment
+        description: "Binary flag. 1 if actual_shipping_days > scheduled_shipping_days, else 0."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+
+      - name: shipping_delay_days
+        description: "Difference between actual and scheduled shipping days. Negative means early."
+        tests:
+          - not_null
+
+      - name: fulfillment_cycle_days
+        description: "Days between order placement and shipment."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+      - name: delay_severity
+        description: "Bucketed delay category: On-Time/Early, Minor Delay, Moderate Delay, or Critical Failure."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['On-Time/Early', 'Minor Delay', 'Moderate Delay', 'Critical Failure']
+
+      - name: order_health
+        description: "Categorises order status into Complete, Canceled, Fraud, or In Progress."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Complete', 'Canceled', 'Fraud', 'In Progress']
+
+      - name: is_late_risk
+        description: >
+          Predicted late delivery risk flag from the source data.
+          Compare with is_late_shipment to evaluate prediction accuracy.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1

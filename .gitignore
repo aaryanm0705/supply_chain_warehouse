@@ -1,0 +1,21 @@
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+
+# Credentials — never commit
+profiles.yml
+.env
+*.env
+
+# dbt local user config
+.user.yml
+
+# Binary files
+*.pbix
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.iml

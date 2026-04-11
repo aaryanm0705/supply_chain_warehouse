@@ -1,0 +1,59 @@
+version: 2
+
+sources:
+  - name: public
+    database: postgres
+    schema: public
+    description: "Raw data loaded into the public schema of the PostgreSQL database."
+    tables:
+      - name: raw_supply_chain
+        description: >
+          Raw DataCo Global supply chain dataset (2015–2018).
+          Each row represents a single order line item — one order_id can appear
+          multiple times when a customer ordered more than one product.
+          Use Order Item Id for row-level uniqueness, not Order Id.
+        columns:
+          - name: '"Order Id"'
+            description: "Order identifier. Not unique at row level — one order can have multiple line items."
+            tests:
+              - not_null
+
+          - name: '"Order Item Id"'
+            description: "Order line item identifier. This is the true grain of the raw table."
+            tests:
+              - not_null
+              - unique
+
+          - name: '"Customer Id"'
+            tests:
+              - not_null
+
+          - name: '"order date (DateOrders)"'
+            tests:
+              - not_null
+
+          - name: '"shipping date (DateOrders)"'
+            tests:
+              - not_null
+
+          - name: '"Days for shipping (real)"'
+            tests:
+              - not_null
+
+          - name: '"Days for shipment (scheduled)"'
+            tests:
+              - not_null
+
+          - name: '"Shipping Mode"'
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['First Class', 'Second Class', 'Same Day', 'Standard Class']
+
+          - name: '"Order Status"'
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['COMPLETE', 'PENDING', 'PENDING_PAYMENT', 'PROCESSING',
+                           'PAYMENT_REVIEW', 'CANCELED', 'SUSPECTED_FRAUD',
+                           'ON_HOLD', 'CLOSED']

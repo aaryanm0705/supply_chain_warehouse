@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: fct_shipping_summary
+    description: "Aggregated summary table by region and shipping mode for the executive dashboard."
+    columns:
+      - name: order_region
+        description: "Geographic region of the orders in this group."
+        tests:
+          - not_null
+
+      - name: shipping_mode
+        description: "Shipping mode for this group."
+        tests:
+          - not_null
+
+      - name: total_orders
+        description: "Count of distinct orders. Uses COUNT(DISTINCT order_id) to account for multi-item orders."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 1
+
+      - name: late_delivery_rate_pct
+        description: "Percentage of orders where actual shipping days exceeded scheduled shipping days."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+      - name: is_anomalous_late_rate
+        description: "True when the late delivery rate is exactly 100%, flagging groups where no order has ever met its schedule. Used to identify the First Class SLA mismatch."
+
+  - name: fct_orders
+    description: "Order line item fact table for time-series and drill-down analysis in Power BI."
+    columns:
+      - name: order_item_id
+        description: "Primary key. One row per order line item."
+        tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: "Order identifier. Multiple rows per order represent individual line items."
+        tests:
+          - not_null
+
+      - name: order_month
+        description: "Order date truncated to month for time-series analysis."
+        tests:
+          - not_null
+
+      - name: order_health
+        description: "Categorises order status into Complete, Canceled, Fraud, or In Progress."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Complete', 'Canceled', 'Fraud', 'In Progress']
+
+      - name: delay_severity
+        description: "Bucketed delay category: On-Time/Early, Minor Delay, Moderate Delay, or Critical Failure."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['On-Time/Early', 'Minor Delay', 'Moderate Delay', 'Critical Failure']
+
+      - name: shipment_status_label
+        description: "Human-readable version of is_late_shipment. Either Late or On Time."
+
+      - name: is_late_shipment
+        description: "Binary flag. 1 = late, 0 = on time."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+
+      - name: is_first_class_anomaly
+        description: >
+          Flags First Class orders where actual shipping days (2) exceed the
+          scheduled window (1). This pattern is consistent across the entire dataset
+          and indicates a systematic SLA mismatch rather than individual delivery failures.
+
+      - name: shipping_mode
+        description: "Shipping mode selected for the order."
+        tests:
+          - not_null
+
+      - name: order_region
+        description: "Geographic region of the order."
+        tests:
+          - not_null
+
+      - name: fulfillment_cycle_days
+        description: "Days between order placement and shipment."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+      - name: order_margin_pct
+        description: "Profit as a percentage of sales for this order line item."
