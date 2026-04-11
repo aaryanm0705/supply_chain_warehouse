@@ -11,11 +11,12 @@ profiles.yml
 # dbt local user config
 .user.yml
 
-# Binary files
-*.pbix
-
 # OS / editor
 .DS_Store
 .idea/
 .vscode/
 *.imldata/DataCoSupplyChainDataset.csv
+analyses/
+macros/
+seeds/
+tests/
