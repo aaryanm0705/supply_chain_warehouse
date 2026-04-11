@@ -167,3 +167,7 @@ dbt test
 
 [DataCo Smart Supply Chain Dataset](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis) — Kaggle  
 Covers 2015–2018 across 22 regions, 4 shipping modes, and 11 product departments.
+
+## Write-up
+
+[Building My First dbt Pipeline: What the Data Actually Showed](https://medium.com/p/eccff60214c2) — Medium
