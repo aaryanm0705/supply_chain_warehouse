@@ -1,7 +1,7 @@
 # Supply Chain Shipping Performance — Analytics Engineering
 
 > **Stack:** PostgreSQL · dbt Core · Power BI  
-> **Dataset:** DataCo Global | 2015–2018 | ~180K order line items across 22 regions
+> **Dataset:** DataCo Global | 2015–2018 | ~180K order line items (~66K distinct orders) across 22 regions
 
 An end-to-end analytics engineering project that transforms raw transactional supply chain data into a structured data warehouse and executive dashboard. The goal was to move beyond surface-level reporting and identify the operational patterns driving late deliveries, margin variance, and fulfillment inconsistency.
 
